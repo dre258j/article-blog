@@ -1,0 +1,14 @@
+<% layout('layout') %>
+
+<a href="/new" class="btn">+ New Article</a>
+
+<% if (articles.length === 0) { %>
+  <p>No articles yet.</p>
+<% } else { %>
+  <% articles.forEach(article => { %>
+    <div class="post">
+      <h2><%= article.title %></h2>
+      <p><%= article.content %></p>
+    </div>
+  <% }) %>
+<% } %>
