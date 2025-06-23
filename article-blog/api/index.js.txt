@@ -3,11 +3,11 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
-
 const app = express();
+
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-app.use(express.static('public'));
+app.set('views', path.join(__dirname, '../views'));
+app.use(express.static(path.join(__dirname, '../public')));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(session({
@@ -16,16 +16,14 @@ app.use(session({
   saveUninitialized: true
 }));
 
-// Dummy login
 const USER = { username: 'admin', password: '1234' };
 
-// Load posts
 function loadPosts() {
-  if (!fs.existsSync('posts.json')) fs.writeFileSync('posts.json', '[]');
-  return JSON.parse(fs.readFileSync('posts.json'));
+  const filePath = path.join(__dirname, '../posts.json');
+  if (!fs.existsSync(filePath)) fs.writeFileSync(filePath, '[]');
+  return JSON.parse(fs.readFileSync(filePath));
 }
 
-// Routes
 app.get('/', (req, res) => {
   const posts = loadPosts().reverse();
   res.render('index', { posts });
@@ -60,9 +58,8 @@ app.post('/new', (req, res) => {
   const { title, content } = req.body;
   const posts = loadPosts();
   posts.push({ title, content, date: new Date().toLocaleString() });
-  fs.writeFileSync('posts.json', JSON.stringify(posts, null, 2));
+  fs.writeFileSync(path.join(__dirname, '../posts.json'), JSON.stringify(posts, null, 2));
   res.redirect('/');
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+module.exports = app;
